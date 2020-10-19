@@ -1,0 +1,70 @@
+CREATE TABLE IF NOT EXISTS `exchange` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(10) NOT NULL,
+  `currency` CHAR(3) NULL DEFAULT NULL,
+  `created_date` DATETIME NULL DEFAULT CURRENT_TIMESTAMP(),
+  `last_updated` DATETIME NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+CREATE TABLE IF NOT EXISTS `ticker` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `exchange_id` INT(11) NOT NULL,
+  `ticker` VARCHAR(10) NOT NULL,
+  `name` VARCHAR(100) NULL,
+  `sector` VARCHAR(100) NULL,
+  `industry` VARCHAR(100) NULL,
+  `created_date` DATETIME NULL DEFAULT CURRENT_TIMESTAMP(),
+  `last_updated` DATETIME NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
+  PRIMARY KEY (`id`),
+  INDEX `exchange_id` (`exchange_id` ASC),
+  INDEX `ticker` (`ticker` ASC),
+  CONSTRAINT `fk_exchange_id`
+    FOREIGN KEY (`exchange_id`)
+    REFERENCES `exchange` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+CREATE TABLE IF NOT EXISTS `data_vendor` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(32) NOT NULL,
+  `website_url` VARCHAR(255) NULL DEFAULT NULL,
+  `created_date` DATETIME NULL DEFAULT CURRENT_TIMESTAMP(),
+  `last_updated` DATETIME NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB
+AUTO_INCREMENT = 3
+DEFAULT CHARACTER SET = utf8;
+
+CREATE TABLE IF NOT EXISTS `daily_price` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `data_vendor_id` INT(11) NOT NULL,
+  `ticker_id` INT(11) NOT NULL,
+  `price_date` DATE NOT NULL,
+  `created_date` DATETIME NULL DEFAULT CURRENT_TIMESTAMP(),
+  `last_updated` DATETIME NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
+  `open_price` DECIMAL(11,6) NULL DEFAULT NULL,
+  `high_price` DECIMAL(11,6) NULL DEFAULT NULL,
+  `low_price` DECIMAL(11,6) NULL DEFAULT NULL,
+  `close_price` DECIMAL(11,6) NULL DEFAULT NULL,
+  `adj_close_price` DECIMAL(11,6) NULL DEFAULT NULL,
+  `volume` BIGINT(20) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `price_date` (`price_date` ASC),
+  INDEX `ticker_id` (`ticker_id` ASC),
+  CONSTRAINT `fk_ticker_id`
+    FOREIGN KEY (`ticker_id`)
+    REFERENCES `ticker` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_data_vendor_id`
+    FOREIGN KEY (`data_vendor_id`)
+    REFERENCES `data_vendor` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+

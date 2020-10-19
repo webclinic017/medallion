@@ -1,0 +1,4 @@
+Loading prices for FB ...
+('2020-10-05', '262.2000', '264.8650', '260.8401', '264.6500', None, '12822252')
+ticker_id: 3901 ; data_vendor_id: 3
+FB : Added  None  candles to DB
