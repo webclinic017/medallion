@@ -26,7 +26,7 @@ volume integer, price_target real(15,5), num_analysts integer\
     c.execute(sql)
     self.conn.commit()
 
-  def candleTableExists(self, table_name):
+  def tableExists(self, table_name):
     sql = f'''SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}';'''
     c = self.conn.cursor()
     c.execute(sql)
@@ -85,14 +85,14 @@ VALUES(?,?,?,?,?,?,?,?)'''.format(table_name)
   ### High Level Functions ###
   ############################
   def insertCandleDfIntoDb(self, table_name, candleDf):
-    self.createTableIfNotExists(table_name)
+    self.createCandleTableIfNotExists(table_name)
     num_candles = len(candleDf.index)
     inserted = 0
     for row in range(num_candles):
       cnd = candleDf.iloc[row].to_list()
       dt_date = datetime.strptime(cnd[0], '%Y%m%d') if len(cnd[0]) == 8 else datetime.strptime(cnd[0], '%Y%m%d %H:%M:%S')
       try:
-        candles_inserted = self.insertCandle(table_name, dt_date, cnd[1], cnd[2], cnd[3], cnd[4], cnd[5], cnd[6])
+        candles_inserted = self.insertCandle(table_name, dt_date, cnd[1], cnd[2], cnd[3], cnd[4], cnd[5], cnd[6] if 6 in cnd else None)
         inserted += candles_inserted
       except Exception as e:
         print(e, 'FOR TIME', cnd[0])
