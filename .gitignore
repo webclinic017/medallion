@@ -2,3 +2,4 @@ ibapi
 __pycache__
 .ipynb_checkpoints
 py_38_env
+.vscode
