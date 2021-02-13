@@ -103,8 +103,12 @@ VALUES(?,?,?,?,?,?,?,?)'''.format(table_name)
     sql = '''SELECT * FROM {} WHERE time < ? ORDER BY time DESC LIMIT ?'''.format(table_name)
     c = self.conn.cursor()
     c.execute(sql, (latest_date, num_candles))
-    data = c.fetchall()
-    df = pd.DataFrame(data, columns=['date', 'open', 'high', 'low', 'close', 'volume', 'price_target', 'num_analysts'])
+    candles = c.fetchall()
+    only_ohlcv_len = 6
+    if len(candles[0]) == only_ohlcv_len:
+      df = pd.DataFrame(candles, columns=['date', 'open', 'high', 'low', 'close', 'volume'])
+    else:
+      df = pd.DataFrame(candles, columns=['date', 'open', 'high', 'low', 'close', 'volume', 'price_target', 'num_analysts'])
     df['date'] = df['date'].apply(lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S'))
     return df
 

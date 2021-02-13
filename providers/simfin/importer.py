@@ -89,7 +89,6 @@ def upsertFundamentalIncomeSmt(db, table_name, quarter, stmt):
 def importFundamentals(db, ticker, start_year=2010):
   # in db: row for each quarterly with all the necessary corresponding columns
   table_name = getTableName('simfin', ticker, 'fund')
-  createFundamentalTableIfNotExists(db, table_name)
   current_year = int(datetime.now().strftime('%Y'))
   quarters = ['q1', 'q2', 'q3', 'q4']
   for year in range(start_year, current_year):
@@ -116,6 +115,7 @@ def importFundamentals(db, ticker, start_year=2010):
       print(ticker, year, q, 'Report Date:', data['report_date'])
       #print('Report Date:', data['report_date'])
       if data['report_date']:
+        createFundamentalTableIfNotExists(db, table_name, data)
         insertFundamentalStmt(db, table_name, data)
 
 def importCompanies():
@@ -199,7 +199,7 @@ def importIncomeStmts(db, filepath='/Users/knbo/Downloads/us-income-quarterly.cs
   for stmt in stmts:
     ticker = stmt[0]
     table_name = f'simfin_{ticker}_fund'
-    createFundamentalTableIfNotExists(db, table_name)
+    createFundamentalTableIfNotExists(db, table_name, stmt)
     insertFundamentalStmt(db, table_name, stmt)
 
 def importAllFundamentals(start_year=2000, ticker_start='A'):
@@ -257,7 +257,7 @@ def importMissingFundamentalStmts(db, simfin, ticker_start='A', last_quarter_to_
     simfin_id = company[0]
     ticker = company[1]
     print('\nTicker:', f'{comp_num+1}/{len(companies)}', f'{int((comp_num+1)/len(companies)*100)}%', ticker)
-    if ticker >= ticker_start and '.' not in ticker and '_' not in ticker:
+    if ticker >= ticker_start and '.' not in ticker and '_' not in ticker and '-' not in ticker:
       table_name = 'simfin_' + ticker +'_fund'
       table_exists = db.tableExists(table_name)
       lastStmtQuarter = getCompanysLastStmtQuarter(db, table_name) if table_exists else None
@@ -273,9 +273,9 @@ def importMissingFundamentalStmts(db, simfin, ticker_start='A', last_quarter_to_
           stmt = simfin.getQuarterlyStatement(quarter=quarterSplit[1], fyear=quarterSplit[0], ticker=ticker)
           if 'error' in stmt:
             return stmt
-          print(ticker, quarter, 'Report Date:', stmt['report_date']['val'])
           #print('Report Date:', data['report_date'])
-          if stmt['report_date']:
+          if 'report_date' in stmt:
+            print(ticker, quarter, 'Report Date:', stmt['report_date']['val'])
             createFundamentalTableIfNotExists(db, table_name, stmt)
             insertFundamentalStmt(db, table_name, stmt)
 

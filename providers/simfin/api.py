@@ -1,18 +1,12 @@
 #%% Simfin api
 import requests
 import json
+import os
 from datetime import datetime, timedelta
 
 class SimfinApi():
   def __init__(self):
-    self.simfin_api_keys = [
-      'N37JIMgUfeCf6QUIuzlzCZVXbgA9Ivc8', #kev
-      '3J2I01sJj9sKkl4et2ywYLFdb9ZXv7rI', #jose
-      '6FdV0g93nwnGweNn93EUfd3CHWoa5Ylp', #soco
-      'CBYrCb6ZQ7Naozt0CLy7y3Om6kCNXoBU', #catholink
-      'JpWeaV6mORIdBinnzmRwxx1OdCuRtBi5', #kevbru
-      '5ws6xpYlJ3ZCyCiX0HtIR20yvsil56SM' #rivas
-    ]
+    self.simfin_api_keys = json.loads(os.environ.get('SIMFIN_API_KEYS'))
     self.key_idx = 0
     self.base_url = 'https://simfin.com/api/v2/companies/'
     self.v1_base_url = 'https://simfin.com/api/v1/'
@@ -30,7 +24,7 @@ class SimfinApi():
           break
         elif self.key_idx < len(self.simfin_api_keys) - 1:
           self.key_idx += 1
-          print(response['error'], 'Changing key', self.key_idx+1 , '/', len(self.simfin_api_keys), 'keys used')
+          print(response['error'], 'Changing key. Now using key number', self.key_idx+1 , 'Total number of keys:', len(self.simfin_api_keys), 'keys used')
         else:
           print(response['error'], 'No more keys')
           return response
@@ -140,9 +134,12 @@ class SimfinApi():
     
     #col_index = stmt['columns'].index(key)
     #return stmt['data'][col_index]
-    del stmt['ticker']
-    del stmt['fiscal_period']
-    del stmt['fiscal_year']
+    if 'ticker' in stmt:
+      del stmt['ticker']
+    if 'fiscal_period' in stmt:
+      del stmt['fiscal_period']
+    if 'fiscal_year' in stmt:
+      del stmt['fiscal_year']
     return stmt
 
   def getPriceData(self, simfin_id=None, ticker=None):

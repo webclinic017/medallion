@@ -17,7 +17,7 @@ from backtesting.runner import backtestRunner
 logging.basicConfig(level=logging.ERROR)
 provider = 'ib'
 candle_size = '5m'
-start_date = datetime(2019, 1, 1, 21, 30)
+start_date = datetime(2020, 12, 1, 21, 30)
 end_date = datetime(2020, 12, 31, 21, 00)
 init_balance = 100000
 stratOpts = {
@@ -27,12 +27,12 @@ stratOpts = {
 }
 
 #symbols = ['AUDUSD', 'EURUSD', 'GBPUSD', 'NZDUSD', 'USDCAD', 'USDCHF', 'USDJPY']
-symbol = 'GBP.USD'
+symbol = 'GBPUSD'
 symbols = [symbol]
 reporter = backtestRunner(SessionMomentumTsl, symbols, provider, candle_size, start_date, end_date, init_balance, stratOpts)
-reporter.printTrades('GBP.USD')
-reporter.printResults('GBP.USD')
-chart = reporter.getChart('GBP.USD')
+reporter.printTrades(symbol)
+reporter.printResults(symbol)
+chart = reporter.getChart(symbol)
 chart.write_to_html()
 
 #%%
